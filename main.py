@@ -5,13 +5,8 @@ import time
 
 import pg
 
-
 flags = DOUBLEBUF
 screen = pygame.display.set_mode((300, 343), flags)
-
-
-
-
 
 field_x = 9
 field_y = 9
@@ -19,7 +14,6 @@ total_bombs = 10
 
 
 def load():
-
     global a0, a1, a2, a3, a4, a5, a6, a7, a8, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, hidden, bomb
     a0 = pygame.image.load("assets/0.png").convert()
     a1 = pygame.image.load("assets/1.png").convert()
@@ -50,16 +44,14 @@ def fill(arr, x_size, y_size):
     global hidden
     global screen
 
-    x=6
-    y=48
-    while len(arr) != (x_size*y_size):
-        arr.append(pg.image(screen, "covered", hidden, x, y, True, True))
-        x=x+32
-        if x==6+(x_size)*32:
-            x=6
-            y=y+32
-
-
+    x = 6
+    y = 48
+    while len(arr) != (x_size * y_size):
+        arr.append(pg.Image(screen, "covered", hidden, x, y, True, True))
+        x = x + 32
+        if x == 6 + x_size * 32:
+            x = 6
+            y = y + 32
 
 
 if __name__ == '__main__':
@@ -67,22 +59,21 @@ if __name__ == '__main__':
     load()
     running = True
 
-    field = []
-    fill(field, field_x, field_y)
+    covered = []
+    fill(covered, field_x, field_y)
 
     t0 = time.time()
     while running:
-        screen.fill((128,128,128))
+        screen.fill((128, 128, 128))
 
         t1 = (time.time() - t0)
         tint = int(t1)
 
         mouse_pos = pygame.mouse.get_pos()
 
-        for image in pg.image.all:
-            image.mouse_check()
-            image.bloat()
-            image.draw()
+        pg.Image.perform_mouse_check()
+        pg.Image.perform_bloating()
+        pg.Image.name_draw("covered")
 
         events = pygame.event.get()
         for event in events:
@@ -91,15 +82,10 @@ if __name__ == '__main__':
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    for img in pg.image.all:
+                    for img in pg.Image.all:
                         if img.is_highlited and img.name == "covered":
-                            pg.image.all.remove(img)
-                            field.remove(img)
+                            pg.Image.all.remove(img)
+                            covered.remove(img)
                             break
 
-
         pygame.display.flip()
-
-
-
-
