@@ -53,7 +53,7 @@ def fill(arr, x_size, y_size):
     x=6
     y=48
     while len(arr) != (x_size*y_size):
-        arr.append(pg.image(screen, "nah", hidden, x, y, True, True))
+        arr.append(pg.image(screen, "covered", hidden, x, y, True, True))
         x=x+32
         if x==6+(x_size)*32:
             x=6
@@ -84,7 +84,6 @@ if __name__ == '__main__':
             image.bloat()
             image.draw()
 
-
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.WINDOWCLOSE:
@@ -93,7 +92,7 @@ if __name__ == '__main__':
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     for img in pg.image.all:
-                        if img.is_highlited == True:
+                        if img.is_highlited and img.name == "covered":
                             pg.image.all.remove(img)
                             field.remove(img)
                             break

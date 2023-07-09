@@ -18,7 +18,7 @@ class image:
 
         self.is_visible = is_visible
 
-        # constants, DO NOT TOUCH:
+        # constants, DO NOT TOUCH ANYWHERE IN THE CODE:
         self.img_prime = img
         self.prime_x = blit_cord_x
         self.prime_y = blit_cord_y
