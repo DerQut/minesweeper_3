@@ -40,14 +40,13 @@ def load():
     bomb = pygame.image.load("assets/bomb.png")
 
 
-def fill(arr, x_size, y_size):
-    global hidden
+def fill(arr, x_size, y_size, image, name, can_grow):
     global screen
 
     x = 6
     y = 48
     while len(arr) != (x_size * y_size):
-        arr.append(pg.Image(screen, "covered", hidden, x, y, True, True))
+        arr.append(pg.Image(screen, name, image, x, y, True, can_grow))
         x = x + 32
         if x == 6 + x_size * 32:
             x = 6
@@ -60,7 +59,10 @@ if __name__ == '__main__':
     running = True
 
     covered = []
-    fill(covered, field_x, field_y)
+    fill(covered, field_x, field_y, hidden, "covered", True)
+
+    field = []
+    fill(field, field_x, field_y, a0, "uncovered", False)
 
     t0 = time.time()
     while running:
@@ -73,6 +75,7 @@ if __name__ == '__main__':
 
         pg.Image.perform_mouse_check()
         pg.Image.perform_bloating()
+        pg.Image.name_draw("uncovered")
         pg.Image.name_draw("covered")
 
         events = pygame.event.get()
@@ -86,6 +89,5 @@ if __name__ == '__main__':
                         if img.is_highlited and img.name == "covered":
                             pg.Image.all.remove(img)
                             covered.remove(img)
-                            break
 
         pygame.display.flip()

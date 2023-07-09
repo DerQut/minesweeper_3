@@ -41,12 +41,12 @@ class Image:
             self.surface.blit(self.img, (self.x, self.y))
 
     def bloat(self):
-        if self.is_visible and self.can_grow:
-            if self.is_highlited and self.grow_scaler < 1.15:
+        if self.is_visible:
+            if self.is_highlited and self.can_grow and self.grow_scaler < 1.15:
                 self.grow_scaler = self.grow_scaler + 0.0025
                 self.x = self.x - 0.0004 * self.img_width
                 self.y = self.y - 0.0004 * self.img_height
-            elif self.is_highlited == False and self.grow_scaler > 1:
+            elif (self.is_highlited == False or self.can_grow == False) and self.grow_scaler > 1:
                 self.grow_scaler = self.grow_scaler - 0.0025
                 self.x = self.x + 0.0004 * self.img_width
                 self.y = self.y + 0.0004 * self.img_height
