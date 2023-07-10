@@ -6,12 +6,14 @@ import time
 import pg
 import mswpr
 
-flags = DOUBLEBUF
-screen = pygame.display.set_mode((300, 343), flags)
-
-field_x = 9
-field_y = 9
+field_x = 10
+field_y = 10
 total_bombs = 10
+
+flags = DOUBLEBUF
+screen = pygame.display.set_mode((12+32*field_x, 18+32*(field_y+1)), flags)
+
+
 
 def load():
     global a0, a1, a2, a3, a4, a5, a6, a7, a8, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, hidden, bomb, flag, smile
@@ -48,7 +50,7 @@ def fill(arr, x_size, y_size, image, name, can_grow, visible):
     global screen
 
     x = 6
-    y = 48
+    y = 44
     while len(arr) != (x_size * y_size):
         arr.append(pg.Image(screen, name, image, x, y, visible, can_grow))
         x = x + 32
@@ -60,7 +62,7 @@ def get_cord(arr, x_size, y_size, bonus):
     i=0
     success = False
     while i < x_size * y_size:
-        if arr[i].is_visible and arr[i].is_highlited:
+        if arr[i].is_highlited:
             success = True
             break
         i = i + 1
@@ -98,7 +100,7 @@ if __name__ == '__main__':
 
     t0 = time.time()
     while running:
-        screen.fill((128, 128, 128))
+        screen.fill((130, 130, 130))
 
         t1 = (time.time() - t0)
         tint = int(t1)
@@ -130,10 +132,13 @@ if __name__ == '__main__':
                         if set_up == False:
                             field = mswpr.setup(screen, cord, field_x, field_y, total_bombs, covered)
                             set_up = True
-                        mswpr.uncover(cord, covered, field, field_x, field_y, total_bombs)
+                        mswpr.uncover(cord, covered, field, field_x)
 
                     elif event.button == 3 and set_up:
-                        mswpr.flag(cord, covered, flags)
+                        mswpr.flag(cord, covered, flags, field, field_x)
+
+                    if 0 < event.button < 3:
+                        mswpr.advanced_uncover(cord, field, covered, field_x)
 
                 elif cord > 2137:
                     if event.button == 1:

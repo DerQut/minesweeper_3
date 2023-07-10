@@ -85,7 +85,7 @@ def setup(surface, cord, size_x, size_y, bombs, covered):
 
 
     x = 6
-    y = 48
+    y = 44
     i = 0
     while i < size_x*size_y:
         field.append(pg.Image(surface, "uncovered", images[arr[i]], x, y, True, False))
@@ -96,6 +96,8 @@ def setup(surface, cord, size_x, size_y, bombs, covered):
         field[i].is_left_edge = True
         field[i].is_upper_edge = True
         field[i].is_lower_edge = True
+
+        field[i].flags_around = 0
 
         covered[i].is_flagged = False
 
@@ -118,7 +120,7 @@ def setup(surface, cord, size_x, size_y, bombs, covered):
     return field
 
 
-def uncover(cord, covered, field, size_x, size_y, bombs):
+def uncover(cord, covered, field, size_x):
 
     if cord != 2137 and not covered[cord].is_flagged:
 
@@ -129,55 +131,114 @@ def uncover(cord, covered, field, size_x, size_y, bombs):
             #up
             if not field[cord].is_upper_edge:
                 if covered[cord - size_x].is_visible and not covered[cord-size_x].is_flagged:
-                    uncover(cord - size_x, covered, field, size_x, size_y, bombs)
+                    uncover(cord - size_x, covered, field, size_x)
 
             #down
             if not field[cord].is_lower_edge:
                 if covered[cord + size_x].is_visible and not covered[cord + size_x].is_flagged:
-                    uncover(cord + size_x, covered, field, size_x, size_y, bombs)
+                    uncover(cord + size_x, covered, field, size_x)
 
             #left
             if not field[cord].is_left_edge:
                 if covered[cord - 1].is_visible and not covered[cord - 1].is_flagged:
-                    uncover(cord - 1, covered, field, size_x, size_y, bombs)
+                    uncover(cord - 1, covered, field, size_x)
 
             #right
             if not field[cord].is_right_edge:
                 if covered[cord + 1].is_visible and not covered[cord + 1].is_flagged:
-                    uncover(cord + 1, covered, field, size_x, size_y, bombs)
+                    uncover(cord + 1, covered, field, size_x)
 
             #up right
             if (not field[cord].is_right_edge) and (not field[cord].is_upper_edge):
                 if covered[cord - size_x + 1].is_visible and not covered[cord - size_x + 1].is_flagged:
-                    uncover(cord - size_x + 1, covered, field, size_x, size_y, bombs)
+                    uncover(cord - size_x + 1, covered, field, size_x)
 
             #up left
             if (not field[cord].is_left_edge) and (not field[cord].is_upper_edge):
                 if covered[cord - size_x - 1].is_visible and not covered[cord - size_x - 1].is_flagged:
-                    uncover(cord - size_x - 1, covered, field, size_x, size_y, bombs)
+                    uncover(cord - size_x - 1, covered, field, size_x)
 
             #down right
             if (not field[cord].is_right_edge) and (not field[cord].is_lower_edge):
                 if covered[cord + size_x + 1].is_visible and not covered[cord + size_x + 1].is_flagged:
-                    uncover(cord + size_x + 1, covered, field, size_x, size_y, bombs)
+                    uncover(cord + size_x + 1, covered, field, size_x)
 
             #down left
             if (not field[cord].is_left_edge) and (not field[cord].is_lower_edge):
                 if covered[cord + size_x - 1].is_visible and not covered[cord + size_x - 1].is_flagged:
-                    uncover(cord + size_x - 1, covered, field, size_x, size_y, bombs)
+                    uncover(cord + size_x - 1, covered, field, size_x)
 
 
 
         elif field[cord].value == 9:
             print("ODKRYŁEM BOMBE")
 
-def flag(cord, covered, flags):
+def flag(cord, covered, flags, field, size_x):
     if cord != 2137:
         if not covered[cord].is_flagged:
             covered[cord].is_flagged = True
             covered[cord].can_grow = False
             flags[cord].is_visible = True
+
+            if not field[cord].is_left_edge:
+                field[cord-1].flags_around = field[cord-1].flags_around + 1
+            if not field[cord].is_right_edge:
+                field[cord+1].flags_around = field[cord+1].flags_around + 1
+            if not field[cord].is_lower_edge:
+                field[cord+size_x].flags_around = field[cord+size_x].flags_around + 1
+            if not field[cord].is_upper_edge:
+                field[cord-size_x].flags_around = field[cord-size_x].flags_around + 1
+
+            if (not field[cord].is_left_edge) and (not field[cord].is_upper_edge):
+                field[cord-1-size_x].flags_around = field[cord-1-size_x].flags_around + 1
+            if (not field[cord].is_left_edge) and (not field[cord].is_lower_edge):
+                field[cord-1+size_x].flags_around = field[cord-1+size_x].flags_around + 1
+            if (not field[cord].is_right_edge) and (not field[cord].is_upper_edge):
+                field[cord+1-size_x].flags_around = field[cord+1-size_x].flags_around + 1
+            if (not field[cord].is_right_edge) and (not field[cord].is_lower_edge):
+                field[cord+1+size_x].flags_around = field[cord+1+size_x].flags_around + 1
+
         else:
             covered[cord].is_flagged = False
             covered[cord].can_grow = True
             flags[cord].is_visible = False
+
+            if not field[cord].is_left_edge:
+                field[cord - 1].flags_around = field[cord - 1].flags_around - 1
+            if not field[cord].is_right_edge:
+                field[cord + 1].flags_around = field[cord + 1].flags_around - 1
+            if not field[cord].is_lower_edge:
+                field[cord + size_x].flags_around = field[cord + size_x].flags_around - 1
+            if not field[cord].is_upper_edge:
+                field[cord - size_x].flags_around = field[cord - size_x].flags_around - 1
+
+            if (not field[cord].is_left_edge) and (not field[cord].is_upper_edge):
+                field[cord - 1 - size_x].flags_around = field[cord - 1 - size_x].flags_around - 1
+            if (not field[cord].is_left_edge) and (not field[cord].is_lower_edge):
+                field[cord - 1 + size_x].flags_around = field[cord - 1 + size_x].flags_around - 1
+            if (not field[cord].is_right_edge) and (not field[cord].is_upper_edge):
+                field[cord + 1 - size_x].flags_around = field[cord + 1 - size_x].flags_around - 1
+            if (not field[cord].is_right_edge) and (not field[cord].is_lower_edge):
+                field[cord + 1 + size_x].flags_around = field[cord + 1 + size_x].flags_around - 1
+
+def advanced_uncover(cord, field, covered, size_x):
+    if cord < 2137 and field[cord].value != 0:
+        if field[cord].value == field[cord].flags_around:
+            if not field[cord].is_left_edge:
+                uncover(cord-1, covered, field, size_x)
+            if not field[cord].is_right_edge:
+                uncover(cord+1, covered, field, size_x)
+            if not field[cord].is_lower_edge:
+                uncover(cord+size_x, covered, field, size_x)
+            if not field[cord].is_upper_edge:
+                uncover(cord-size_x, covered, field, size_x)
+
+            if (not field[cord].is_left_edge) and (not field[cord].is_upper_edge):
+                uncover(cord-1-size_x, covered, field, size_x)
+            if (not field[cord].is_left_edge) and (not field[cord].is_lower_edge):
+                uncover(cord-1+size_x, covered, field, size_x)
+            if (not field[cord].is_right_edge) and (not field[cord].is_upper_edge):
+                uncover(cord+1-size_x, covered, field, size_x)
+            if (not field[cord].is_right_edge) and (not field[cord].is_lower_edge):
+                uncover(cord+1+size_x, covered, field, size_x)
+
