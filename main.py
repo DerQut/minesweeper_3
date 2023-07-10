@@ -70,7 +70,6 @@ def get_cord(arr, x_size, y_size):
         #yes im using the funny pope number as the error handler
 
 
-
 if __name__ == '__main__':
 
     load()
