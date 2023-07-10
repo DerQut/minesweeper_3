@@ -51,6 +51,7 @@ def fill(arr, x_size, y_size, image, name, can_grow):
         if x == 6 + x_size * 32:
             x = 6
             y = y + 32
+
 def get_cord(arr, x_size, y_size):
     i=0
     success = False
