@@ -88,6 +88,7 @@ def setup(surface, cord, size_x, size_y, bombs, covered):
     y = 48
     i = 0
     while i < size_x*size_y:
+        print(arr[i])
         field.append(pg.Image(surface, "uncovered", images[arr[i]], x, y, True, False))
 
         field[i].value = arr[i]
@@ -172,6 +173,7 @@ def uncover(cord, covered, field, size_x, size_y, bombs):
             print("ODKRYŁEM BOMBE")
 
 def flag(cord, covered, flags):
+    print(cord)
     if cord != 2137:
         if not covered[cord].is_flagged:
             covered[cord].is_flagged = True
