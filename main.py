@@ -6,9 +6,9 @@ import time
 import pg
 import mswpr
 
-field_x = 10
-field_y = 10
-total_bombs = 10
+field_x = 20
+field_y = 20
+total_bombs = 20
 
 flags = DOUBLEBUF
 screen = pygame.display.set_mode((12+32*field_x, 18+32*(field_y+1)), flags)

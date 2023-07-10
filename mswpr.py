@@ -175,7 +175,7 @@ def uncover(cord, covered, field, size_x):
 
 def flag(cord, covered, flags, field, size_x):
     if cord != 2137:
-        if not covered[cord].is_flagged:
+        if not covered[cord].is_flagged and covered[cord].is_visible:
             covered[cord].is_flagged = True
             covered[cord].can_grow = False
             flags[cord].is_visible = True
