@@ -74,4 +74,3 @@ class Image:
     def perform_bloating(cls):
         for img in cls.all:
             img.bloat()
-

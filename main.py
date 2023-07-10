@@ -4,6 +4,7 @@ from pygame.locals import *
 import time
 
 import pg
+import mswpr
 
 flags = DOUBLEBUF
 screen = pygame.display.set_mode((300, 343), flags)
@@ -11,7 +12,6 @@ screen = pygame.display.set_mode((300, 343), flags)
 field_x = 9
 field_y = 9
 total_bombs = 10
-
 
 def load():
     global a0, a1, a2, a3, a4, a5, a6, a7, a8, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, hidden, bomb
@@ -51,6 +51,21 @@ def fill(arr, x_size, y_size, image, name, can_grow):
         if x == 6 + x_size * 32:
             x = 6
             y = y + 32
+def get_cord(arr, x_size, y_size):
+    i=0
+    success = False
+    while i < x_size * y_size:
+        if arr[i].is_visible and arr[i].is_highlited:
+            success = True
+            break
+        i = i + 1
+
+    if success:
+        return i
+    else:
+        return 2137
+        #yes im using the funny pope number as the error handler
+
 
 
 if __name__ == '__main__':
@@ -58,11 +73,11 @@ if __name__ == '__main__':
     load()
     running = True
 
+    set_up = False
+
     covered = []
     fill(covered, field_x, field_y, hidden, "covered", True)
 
-    field = []
-    fill(field, field_x, field_y, a0, "uncovered", False)
 
     t0 = time.time()
     while running:
@@ -75,7 +90,9 @@ if __name__ == '__main__':
 
         pg.Image.perform_mouse_check()
         pg.Image.perform_bloating()
-        pg.Image.name_draw("uncovered")
+
+        if set_up:
+            pg.Image.name_draw("uncovered")
         pg.Image.name_draw("covered")
 
         events = pygame.event.get()
@@ -85,9 +102,14 @@ if __name__ == '__main__':
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    for img in pg.Image.all:
-                        if img.is_highlited and img.name == "covered":
-                            pg.Image.all.remove(img)
-                            covered.remove(img)
+
+                    cord = get_cord(covered, field_x, field_y)
+
+                    if set_up == False:
+                        field = mswpr.setup(screen, cord, field_x, field_y, total_bombs)
+                        set_up = True
+                    if 0 <= cord < field_x*field_y:
+                        mswpr.uncover(cord, covered, field, field_x, field_y, total_bombs)
+
 
         pygame.display.flip()
