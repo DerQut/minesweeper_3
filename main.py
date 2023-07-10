@@ -14,7 +14,7 @@ field_y = 9
 total_bombs = 10
 
 def load():
-    global a0, a1, a2, a3, a4, a5, a6, a7, a8, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, hidden, bomb
+    global a0, a1, a2, a3, a4, a5, a6, a7, a8, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, hidden, bomb, flag
     a0 = pygame.image.load("assets/0.png").convert()
     a1 = pygame.image.load("assets/1.png").convert()
     a2 = pygame.image.load("assets/2.png").convert()
@@ -36,17 +36,19 @@ def load():
     s8 = pygame.image.load("assets/s8.png").convert()
     s9 = pygame.image.load("assets/s9.png").convert()
 
-    hidden = pygame.image.load("assets/facingDown.png")
-    bomb = pygame.image.load("assets/bomb.png")
+    hidden = pygame.image.load("assets/facingDown.png").convert()
+    bomb = pygame.image.load("assets/bomb.png").convert()
+
+    flag = pygame.image.load("assets/flagged.png").convert()
 
 
-def fill(arr, x_size, y_size, image, name, can_grow):
+def fill(arr, x_size, y_size, image, name, can_grow, visible):
     global screen
 
     x = 6
     y = 48
     while len(arr) != (x_size * y_size):
-        arr.append(pg.Image(screen, name, image, x, y, True, can_grow))
+        arr.append(pg.Image(screen, name, image, x, y, visible, can_grow))
         x = x + 32
         if x == 6 + x_size * 32:
             x = 6
@@ -77,7 +79,10 @@ if __name__ == '__main__':
     set_up = False
 
     covered = []
-    fill(covered, field_x, field_y, hidden, "covered", True)
+    fill(covered, field_x, field_y, hidden, "covered", True, True)
+
+    flags = []
+    fill(flags, field_x, field_y, flag, "flag", False, False)
 
 
     t0 = time.time()
@@ -95,6 +100,7 @@ if __name__ == '__main__':
         if set_up:
             pg.Image.name_draw("uncovered")
         pg.Image.name_draw("covered")
+        pg.Image.name_draw("flag")
 
         events = pygame.event.get()
         for event in events:
@@ -102,15 +108,18 @@ if __name__ == '__main__':
                 running = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                cord = get_cord(covered, field_x, field_y)
                 if event.button == 1:
 
-                    cord = get_cord(covered, field_x, field_y)
-
                     if set_up == False:
-                        field = mswpr.setup(screen, cord, field_x, field_y, total_bombs)
+                        field = mswpr.setup(screen, cord, field_x, field_y, total_bombs, covered)
                         set_up = True
                     if 0 <= cord < field_x*field_y:
                         mswpr.uncover(cord, covered, field, field_x, field_y, total_bombs)
+
+                elif event.button == 3 and set_up:
+                    mswpr.flag(cord, covered, flags)
+
 
 
         pygame.display.flip()

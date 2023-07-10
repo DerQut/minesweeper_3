@@ -1,6 +1,9 @@
 import pg
+
 import random
 import pygame
+import time
+
 
 def load_local():
 
@@ -19,7 +22,7 @@ def load_local():
     bomb = pygame.image.load("assets/bomb.png")
 
 
-def setup(surface, cord, size_x, size_y, bombs):
+def setup(surface, cord, size_x, size_y, bombs, covered):
 
     load_local()
 
@@ -80,12 +83,6 @@ def setup(surface, cord, size_x, size_y, bombs):
                     arr[a+size_x-1] = arr[a+size_x-1]+1
             i = i + 1
 
-    #why?????
-    i = 0
-    while i < size_x*size_y:
-        if arr[i] > 9:
-            arr[i] = 9
-        i = i + 1
 
     x = 6
     y = 48
@@ -100,6 +97,8 @@ def setup(surface, cord, size_x, size_y, bombs):
         field[i].is_left_edge = True
         field[i].is_upper_edge = True
         field[i].is_lower_edge = True
+
+        covered[i].is_flagged = False
 
         if i >= size_x:
             field[i].is_upper_edge = False
@@ -120,12 +119,9 @@ def setup(surface, cord, size_x, size_y, bombs):
     return field
 
 
-
-
-
 def uncover(cord, covered, field, size_x, size_y, bombs):
 
-    if cord != 2137:
+    if cord != 2137 and not covered[cord].is_flagged:
 
         covered[cord].is_visible = False
 
@@ -133,42 +129,42 @@ def uncover(cord, covered, field, size_x, size_y, bombs):
 
             #up
             if not field[cord].is_upper_edge:
-                if covered[cord - size_x].is_visible:
+                if covered[cord - size_x].is_visible and not covered[cord-size_x].is_flagged:
                     uncover(cord - size_x, covered, field, size_x, size_y, bombs)
 
             #down
             if not field[cord].is_lower_edge:
-                if covered[cord + size_x].is_visible:
+                if covered[cord + size_x].is_visible and not covered[cord + size_x].is_flagged:
                     uncover(cord + size_x, covered, field, size_x, size_y, bombs)
 
             #left
             if not field[cord].is_left_edge:
-                if covered[cord - 1].is_visible:
+                if covered[cord - 1].is_visible and not covered[cord - 1].is_flagged:
                     uncover(cord - 1, covered, field, size_x, size_y, bombs)
 
             #right
             if not field[cord].is_right_edge:
-                if covered[cord + 1].is_visible:
+                if covered[cord + 1].is_visible and not covered[cord + 1].is_flagged:
                     uncover(cord + 1, covered, field, size_x, size_y, bombs)
 
             #up right
             if (not field[cord].is_right_edge) and (not field[cord].is_upper_edge):
-                if covered[cord - size_x + 1].is_visible:
+                if covered[cord - size_x + 1].is_visible and not covered[cord - size_x + 1].is_flagged:
                     uncover(cord - size_x + 1, covered, field, size_x, size_y, bombs)
 
             #up left
             if (not field[cord].is_left_edge) and (not field[cord].is_upper_edge):
-                if covered[cord - size_x - 1].is_visible:
+                if covered[cord - size_x - 1].is_visible and not covered[cord - size_x - 1].is_flagged:
                     uncover(cord - size_x - 1, covered, field, size_x, size_y, bombs)
 
             #down right
             if (not field[cord].is_right_edge) and (not field[cord].is_lower_edge):
-                if covered[cord + size_x + 1].is_visible:
+                if covered[cord + size_x + 1].is_visible and not covered[cord + size_x + 1].is_flagged:
                     uncover(cord + size_x + 1, covered, field, size_x, size_y, bombs)
 
             #down left
             if (not field[cord].is_left_edge) and (not field[cord].is_lower_edge):
-                if covered[cord + size_x - 1].is_visible:
+                if covered[cord + size_x - 1].is_visible and not covered[cord + size_x - 1].is_flagged:
                     uncover(cord + size_x - 1, covered, field, size_x, size_y, bombs)
 
 
@@ -176,3 +172,14 @@ def uncover(cord, covered, field, size_x, size_y, bombs):
         elif field[cord].value == 9:
             print("ODKRYŁEM BOMBE")
 
+def flag(cord, covered, flags):
+    print(cord)
+    if cord != 2137:
+        if not covered[cord].is_flagged:
+            covered[cord].is_flagged = True
+            covered[cord].can_grow = False
+            flags[cord].is_visible = True
+        else:
+            covered[cord].is_flagged = False
+            covered[cord].can_grow = True
+            flags[cord].is_visible = False
