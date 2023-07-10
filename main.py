@@ -14,7 +14,7 @@ field_y = 9
 total_bombs = 10
 
 def load():
-    global a0, a1, a2, a3, a4, a5, a6, a7, a8, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, hidden, bomb, flag
+    global a0, a1, a2, a3, a4, a5, a6, a7, a8, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, hidden, bomb, flag, smile
     a0 = pygame.image.load("assets/0.png").convert()
     a1 = pygame.image.load("assets/1.png").convert()
     a2 = pygame.image.load("assets/2.png").convert()
@@ -41,6 +41,8 @@ def load():
 
     flag = pygame.image.load("assets/flagged.png").convert()
 
+    smile = pygame.image.load("assets/smiling.png").convert()
+
 
 def fill(arr, x_size, y_size, image, name, can_grow, visible):
     global screen
@@ -54,7 +56,7 @@ def fill(arr, x_size, y_size, image, name, can_grow, visible):
             x = 6
             y = y + 32
 
-def get_cord(arr, x_size, y_size):
+def get_cord(arr, x_size, y_size, bonus):
     i=0
     success = False
     while i < x_size * y_size:
@@ -62,6 +64,14 @@ def get_cord(arr, x_size, y_size):
             success = True
             break
         i = i + 1
+    if not success:
+        i = 0
+        while i < len(bonus):
+            if bonus[i].is_visible and bonus[i].is_highlited:
+                success = True
+                i=i+2138
+                break
+            i=i+1
 
     if success:
         return i
@@ -82,7 +92,9 @@ if __name__ == '__main__':
 
     flags = []
     fill(flags, field_x, field_y, flag, "flag", False, False)
+    flags_placed = 0
 
+    reset_button = pg.Image(screen, "reset", smile, (6 + 16*(field_x-1)), 6, True, True)
 
     t0 = time.time()
     while running:
@@ -98,8 +110,10 @@ if __name__ == '__main__':
 
         if set_up:
             pg.Image.name_draw("uncovered")
+
         pg.Image.name_draw("covered")
         pg.Image.name_draw("flag")
+        pg.Image.name_draw("reset")
 
         events = pygame.event.get()
         for event in events:
@@ -107,17 +121,32 @@ if __name__ == '__main__':
                 running = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                cord = get_cord(covered, field_x, field_y)
-                if event.button == 1:
+                cord = get_cord(covered, field_x, field_y, [reset_button])
+                print(cord)
 
-                    if set_up == False:
-                        field = mswpr.setup(screen, cord, field_x, field_y, total_bombs, covered)
-                        set_up = True
-                    if 0 <= cord < field_x*field_y:
+                if 0 <= cord < field_x * field_y:
+                    if event.button == 1:
+
+                        if set_up == False:
+                            field = mswpr.setup(screen, cord, field_x, field_y, total_bombs, covered)
+                            set_up = True
                         mswpr.uncover(cord, covered, field, field_x, field_y, total_bombs)
 
-                elif event.button == 3 and set_up:
-                    mswpr.flag(cord, covered, flags)
+                    elif event.button == 3 and set_up:
+                        mswpr.flag(cord, covered, flags)
+
+                elif cord > 2137:
+                    if event.button == 1:
+                        flags_placed = 0
+                        for x in covered:
+                            x.is_visible = True
+                            x.is_flagged = False
+                            x.is_highlited = False
+                            x.can_grow = True
+                        for x in flags:
+                            x.is_visible = False
+                        set_up = False
+                        field = []
 
 
 
